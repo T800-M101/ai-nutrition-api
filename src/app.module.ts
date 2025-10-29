@@ -5,18 +5,23 @@ import { AiModule } from './ai/ai.module';
 import { UsersModule } from './users/users.module';
 import { MealsModule } from './meals/meals.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
+import { User } from './users/user.entity';
+import { Meal } from './meals/meal.entity';
+import { Ai } from './ai/ai.entity';
 
 @Module({
   imports: [
     TypeOrmModule.forRoot({
       type: 'sqlite',
       database: 'db.sqlite',
-      entities:[],
+      entities:[User, Meal, Ai],
       synchronize: true
     }),
     AiModule, 
     UsersModule, 
-    MealsModule
+    MealsModule, 
+    AuthModule
   ],
   controllers: [AppController],
   providers: [AppService],
