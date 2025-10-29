@@ -5,26 +5,26 @@ import { AuthService } from 'src/auth/auth.service';
 import { CreateUserDto } from 'src/users/dtos/create-user.dto';
 import { UserDto } from 'src/users/dtos/user.dto';
 import { User } from 'src/users/user.entity';
-import { Logger } from 'src/util/logger';
+import { Logger } from '@nestjs/common';
 
-@ApiTags('Auth')
+@ApiTags('auth')
 @Controller('auth')
 @Serialize(UserDto)
 export class AuthController {
-  private logger = new Logger('Auth Controller');
+  private readonly logger = new Logger(AuthController.name);
 
   constructor(private authService: AuthService) {}
 
-  @Post('signup')
+  @Post('/signup')
   async createUser(@Body() body: CreateUserDto): Promise<Partial<User>> {
-    const { email, password } = body;
+    const { email } = body;
 
-    this.logger.info(
-      `POST - Received create request: email: ${email}, password: *****`,
-      { layer: 'controller' },
-    );
+    this.logger.log(`POST /auth/signup - Received signup request: email: ${email}`);
 
     const user = await this.authService.signup(body);
+
+    this.logger.log(`User created successfully: ${email}`);
+
     return user;
   }
 }

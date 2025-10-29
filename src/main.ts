@@ -4,7 +4,13 @@ import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const isProd = process.env.NODE_ENV === 'production';
+
+  const app = await NestFactory.create(AppModule, {
+    logger: isProd
+      ? ['error', 'warn', 'log'] // production: quieter
+      : ['error', 'warn', 'log', 'debug', 'verbose'], // dev: full logs
+  });
 
   app.useGlobalPipes(
     new ValidationPipe()
@@ -20,6 +26,7 @@ async function bootstrap() {
     .addTag('users')
     .addTag('meals')
     .addTag('ai')
+    .addTag('auth')
     .addBearerAuth()
     .build();
 

@@ -1,5 +1,4 @@
-import { Controller } from '@nestjs/common';
-import { Logger } from '../util/logger';
+import { Controller, Logger } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
 import { UserDto } from './dtos/user.dto';
@@ -8,7 +7,7 @@ import { UserDto } from './dtos/user.dto';
 @Controller('users')
 @Serialize(UserDto)
 export class UsersController {
-  private logger = new Logger('User Controller');
+  private readonly logger = new Logger(UsersController.name);
 
   constructor() {}
 }
