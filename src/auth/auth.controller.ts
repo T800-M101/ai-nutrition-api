@@ -30,7 +30,7 @@ export class AuthController {
   }
 
   @Post('/signin')
-  async login(@Body() body: SigninDto): Promise<Partial<User>> {
+  async login(@Body() body: SigninDto): Promise<Partial<AuthResponseDto>> {
     const { email, password } = body;
   
     this.logger.log(`POST /auth/signin - Received login request: email: ${email}`);

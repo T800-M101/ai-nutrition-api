@@ -50,13 +50,15 @@ export class AuthService {
       role: user.role,
     };
 
+    const jwtSecret = this.configService.get<string>('JWT_SECRET');
+
     const accessToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
-      expiresIn: '1m',
+      secret: jwtSecret,
+      expiresIn: '15m',
     });
 
     const refreshToken = await this.jwtService.signAsync(payload, {
-      secret: this.configService.get<string>('JWT_SECRET'),
+      secret: jwtSecret,
       expiresIn: '7d',
     });
 
@@ -76,7 +78,7 @@ export class AuthService {
     };
   }
 
-  async signin(email: string, password: string): Promise<Partial<User>> {
+  async signin(email: string, password: string): Promise<Partial<AuthResponseDto>> {
     this.logger.log(`Signin initiated - email: ${email}`);
 
     // Find user by email
@@ -90,16 +92,23 @@ export class AuthService {
       throw new UnauthorizedException('Invalid credentials');
 
     // Generate JWT
-    const payload = { sub: user.id, email: user.email };
-    const accessToken = await this.jwtService.signAsync(payload);
-    (user as any).accessToken = accessToken;
+    const payload = { sub: user.id, email: user.email, role: user.role};
+    const jwtSecret = this.configService.get<string>('JWT_SECRET');
+
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: jwtSecret,
+      expiresIn: '15m', // Increased from default
+    });
 
     this.logger.log(`Signin successful - userId: ${user.id}, email: ${email}`);
 
-    return user;
+    return {
+      user,
+      accessToken
+    };
   }
 
-  async refreshToken(refreshToken: string) {
+  async refreshToken(refreshToken: string): Promise<{accessToken: string}> {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken);
       const user = await this.usersService.findByEmail(payload.email);
