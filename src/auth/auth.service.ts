@@ -24,12 +24,6 @@ export class AuthService {
     // normal signup always defaults to USER
     createUserDto.role = createUserDto.role ?? UserRole.USER;
 
-    // optionally, only admins can create admin users
-    if (createUserDto.role === UserRole.ADMIN) {
-    // check if current user is admin (you can pass current user in request)
-    // throw new ForbiddenException('Only admins can create admin users');
-    }
-
     const { email } = createUserDto;
     this.logger.log(`Signup initiated - email: ${email}`);
 
