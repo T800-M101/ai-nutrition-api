@@ -2,15 +2,31 @@ import { NestFactory } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { ConfigService } from '@nestjs/config';
+
 
 async function bootstrap() {
-  const isProd = process.env.NODE_ENV === 'production';
+  // Set NODE_ENV early if not set
+  if (!process.env.NODE_ENV) {
+    process.env.NODE_ENV = 'development';
+    this.console.warn('NODE_ENV not set, defaulting to "development". For production use: NODE_ENV=production');
+  }
 
-  const app = await NestFactory.create(AppModule, {
-    logger: isProd
+  // Create the Nest app first
+  const app = await NestFactory.create(AppModule);
+
+  // Get ConfigService from the Nest container
+  const configService = app.get(ConfigService);
+
+  // Use ConfigService to check environment
+  const isProd = configService.get<string>('NODE_ENV') === 'production';
+
+  // Set logger configuration dynamically
+  app.useLogger(
+    isProd
       ? ['error', 'warn', 'log'] // production: quieter
-      : ['error', 'warn', 'log', 'debug', 'verbose'], // dev: full logs
-  });
+      : ['error', 'warn', 'log', 'debug', 'verbose'] // dev: full logs
+  );
 
   app.useGlobalPipes(
     new ValidationPipe()
