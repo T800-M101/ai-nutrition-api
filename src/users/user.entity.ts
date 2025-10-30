@@ -1,8 +1,9 @@
 import { Ai } from "src/ai/ai.entity";
+import { UserRole } from "src/auth/enums/user-role.enum";
 import { Meal } from "src/meals/meal.entity";
 import { Column, CreateDateColumn, Entity, OneToMany, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('users')
 export class User {
     @PrimaryGeneratedColumn()
     id: number;
@@ -15,6 +16,9 @@ export class User {
 
     @Column()
     password: string;
+
+    @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+    role: UserRole;
 
     @Column()
     age: number;

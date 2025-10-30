@@ -1,7 +1,7 @@
 import { User } from "src/users/user.entity";
 import { Column, CreateDateColumn, Entity, ManyToOne, PrimaryGeneratedColumn } from "typeorm";
 
-@Entity()
+@Entity('ai_responses')
 export class Ai {
     
     @PrimaryGeneratedColumn()

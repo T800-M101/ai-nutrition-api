@@ -9,24 +9,35 @@ import { AuthModule } from './auth/auth.module';
 import { User } from './users/user.entity';
 import { Meal } from './meals/meal.entity';
 import { Ai } from './ai/ai.entity';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 
 @Module({
   imports: [
     ConfigModule.forRoot({
       isGlobal: true,
-      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`
+      envFilePath: `.env.${process.env.NODE_ENV || 'development'}`,
     }),
-    TypeOrmModule.forRoot({
-      type: 'sqlite',
-      database: process.env.DB_NAME,
-      entities:[User, Meal, Ai],
-      synchronize: true
+    TypeOrmModule.forRootAsync({
+      imports: [ConfigModule],
+      inject: [ConfigService],
+      useFactory: async (config: ConfigService) => {
+        return {
+          type: 'postgres',
+          host: config.get<string>('DB_HOST'),
+          port: config.get<number>('DB_PORT'),
+          username: config.get<string>('DB_USERNAME'),
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_NAME'),
+          entities: [User, Meal, Ai],
+          synchronize: true,
+          logging: true
+        };
+      },
     }),
-    AiModule, 
-    UsersModule, 
-    MealsModule, 
-    AuthModule
+    AiModule,
+    UsersModule,
+    MealsModule,
+    AuthModule,
   ],
   controllers: [AppController],
   providers: [AppService],

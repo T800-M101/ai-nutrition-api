@@ -40,4 +40,8 @@ export class UsersService {
     this.logger.log(`Searching for user by email: ${email}`);
     return await this.usersRepo.findOneBy({ email });
   }
+
+  async findAll(): Promise<User[]> {
+    return this.usersRepo.find();
+  }
 }

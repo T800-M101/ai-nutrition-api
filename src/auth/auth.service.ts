@@ -9,6 +9,7 @@ import { User } from '../users/user.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
+import { UserRole } from './enums/user-role.enum';
 
 @Injectable()
 export class AuthService {
@@ -20,6 +21,15 @@ export class AuthService {
   ) {}
 
   async signup(createUserDto: CreateUserDto): Promise<Partial<User>> {
+    // normal signup always defaults to USER
+    createUserDto.role = createUserDto.role ?? UserRole.USER;
+
+    // optionally, only admins can create admin users
+    if (createUserDto.role === UserRole.ADMIN) {
+    // check if current user is admin (you can pass current user in request)
+    // throw new ForbiddenException('Only admins can create admin users');
+    }
+
     const { email } = createUserDto;
     this.logger.log(`Signup initiated - email: ${email}`);
 
@@ -36,7 +46,7 @@ export class AuthService {
     const user = await this.usersService.create(createUserDto);
 
     //Create JWT
-    const payload = { sub: user.id, email: user.email };
+    const payload = { sub: user.id, email: user.email, role: user.role };
     const accessToken = await this.jwtService.signAsync(payload);
 
     // attach token temporarily to the user object
