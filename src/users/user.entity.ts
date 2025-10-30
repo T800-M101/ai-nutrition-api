@@ -35,6 +35,9 @@ export class User {
     @Column({ nullable: true})
     preferences?: string; // "vegetarian, non-dairy"
 
+    @Column({ type: 'text', nullable: true })
+    hashedRefreshToken?: string | null;        
+
     @CreateDateColumn()
     createdAt: Date;
 

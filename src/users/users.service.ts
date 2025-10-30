@@ -44,4 +44,8 @@ export class UsersService {
   async findAll(): Promise<User[]> {
     return this.usersRepo.find();
   }
+
+  async updateHashedRefreshToken(userId: number, hashedToken: string | null): Promise<void> {
+    await this.usersRepo.update(userId, { hashedRefreshToken: hashedToken });
+  }
 }

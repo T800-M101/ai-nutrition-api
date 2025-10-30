@@ -10,6 +10,9 @@ import { CreateUserDto } from './dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
 import { UserRole } from './enums/user-role.enum';
+import { JwtPayload } from 'src/interfaces/jwt-payload.interface';
+import { AuthResponseDto } from './dtos/auth-response.dto';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class AuthService {
@@ -18,9 +21,10 @@ export class AuthService {
   constructor(
     private usersService: UsersService,
     private jwtService: JwtService,
+    private configService: ConfigService
   ) {}
 
-  async signup(createUserDto: CreateUserDto): Promise<Partial<User>> {
+  async signup(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
     // normal signup always defaults to USER
     createUserDto.role = createUserDto.role ?? UserRole.USER;
 
@@ -39,16 +43,37 @@ export class AuthService {
     // Create new user
     const user = await this.usersService.create(createUserDto);
 
-    //Create JWT
-    const payload = { sub: user.id, email: user.email, role: user.role };
-    const accessToken = await this.jwtService.signAsync(payload);
+    //Create JWT and refresh token
+    const payload: JwtPayload = {
+      sub: user.id,
+      email: user.email,
+      role: user.role,
+    };
 
-    // attach token temporarily to the user object
-    (user as any).accessToken = accessToken;
+    const accessToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: '1m',
+    });
+
+    const refreshToken = await this.jwtService.signAsync(payload, {
+      secret: this.configService.get<string>('JWT_SECRET'),
+      expiresIn: '7d',
+    });
+
+    // Save hashed refresh token in DB
+    const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
+    await this.usersService.updateHashedRefreshToken(
+      user.id,
+      hashedRefreshToken,
+    );
 
     this.logger.log(`Signup successful - userId: ${user.id}, email: ${email}`);
 
-    return user;
+    return {
+      user,
+      accessToken,
+      refreshToken,
+    };
   }
 
   async signin(email: string, password: string): Promise<Partial<User>> {
@@ -72,5 +97,35 @@ export class AuthService {
     this.logger.log(`Signin successful - userId: ${user.id}, email: ${email}`);
 
     return user;
+  }
+
+  async refreshToken(refreshToken: string) {
+    try {
+      const payload = await this.jwtService.verifyAsync(refreshToken);
+      const user = await this.usersService.findByEmail(payload.email);
+
+      if (!user || !user.hashedRefreshToken)
+        throw new UnauthorizedException('Invalid refresh token');
+
+      const isMatch = await bcrypt.compare(
+        refreshToken,
+        user.hashedRefreshToken,
+      );
+      if (!isMatch) throw new UnauthorizedException('Refresh token mismatch');
+
+      // Issue new access token
+      const newAccessToken = await this.jwtService.signAsync(
+        { sub: user.id, email: user.email, role: user.role },
+        { expiresIn: '1h' },
+      );
+
+      return { accessToken: newAccessToken };
+    } catch {
+      throw new UnauthorizedException('Invalid or expired refresh token');
+    }
+  }
+
+  async logout(userId: number) {
+    await this.usersService.updateHashedRefreshToken(userId, null);
   }
 }
