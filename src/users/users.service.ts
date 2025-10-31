@@ -1,12 +1,14 @@
 import {
   Injectable,
   InternalServerErrorException,
+  NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { User } from './user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../auth/dtos/create-user.dto';
 import { Logger } from '@nestjs/common';
+import { UpdateUserDto } from './dtos/update-user.dto';
 
 @Injectable()
 export class UsersService {
@@ -47,5 +49,21 @@ export class UsersService {
 
   async updateHashedRefreshToken(userId: number, hashedToken: string | null): Promise<void> {
     await this.usersRepo.update(userId, { hashedRefreshToken: hashedToken });
+  }
+
+  async update(email: string, attrs: UpdateUserDto): Promise<User> {
+    this.logger.log(`Updating user by email: ${email}`);
+
+    const user = await this.findByEmail(email);
+
+    if(!user) throw new NotFoundException('User not found');
+    
+    Object.assign(user, attrs);
+
+    const updatedUser = await this.usersRepo.save(user);
+
+    this.logger.log('User has been updated.');
+
+    return updatedUser;
   }
 }

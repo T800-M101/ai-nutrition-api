@@ -5,8 +5,10 @@ export class AuthResponseDto {
   @Expose()
   @Type(() => UserDto)
   user: UserDto;
+
   @Expose()  
   accessToken: string;
+  
   @Expose()
   refreshToken: string;
 }

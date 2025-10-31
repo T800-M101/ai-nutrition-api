@@ -25,9 +25,6 @@ export class UserDto {
   @Expose()
   preferences?: string;
 
-  @Expose()
-  accessToken?: string;
-
   @Exclude()
   password: string;
 }

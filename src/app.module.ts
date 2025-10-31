@@ -30,7 +30,8 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           database: config.get<string>('DB_NAME'),
           entities: [User, Meal, Ai],
           synchronize: true,
-          logging: true
+          logging: true,
+          //dropSchema: true
         };
       },
     }),
