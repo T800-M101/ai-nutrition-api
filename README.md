@@ -43,4 +43,35 @@ It helps users manage their nutrition, analyze meals, and generate AI-driven mea
 git clone https://github.com/your-username/ai-nutrition-api.git
 cd ai-nutrition-api
 npm install
+```
 
+### 2️⃣ Set environment variables
+OPENAI_API_KEY=your_openai_api_key_here
+JWT_SECRET=your_jwt_secret_here
+DATABASE_URL=your_database_url_here
+
+3️⃣ Run the app
+```bash
+npm run start:dev
+```
+
+### 🧩 API Documentation
+
+Once the server is running, visit:
+
+👉 Swagger UI: http://localhost:3000/api
+to explore and test all available endpoints.
+
+
+# ⚠️ Disclaimer
+
+This API is a demonstration project created for educational and portfolio purposes only.
+It integrates AI-based nutritional suggestions using the OpenAI API, but:
+
+- **It is not intended for medical or professional dietary use.**
+
+- **The AI responses should not be considered medical advice.**
+
+- **Always consult a certified nutritionist or doctor for health-related decisions.**
+
+- **The author is not responsible for any use or misuse of this API or its data.**

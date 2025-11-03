@@ -6,7 +6,7 @@ import {
   UnauthorizedException,
 } from '@nestjs/common';
 import { UsersService } from '../users/users.service';
-import { User } from '../users/user.entity';
+import { User } from '../users/entities/user.entity';
 import { CreateUserDto } from './dtos/create-user.dto';
 import * as bcrypt from 'bcrypt';
 import { JwtService } from '@nestjs/jwt';
@@ -48,17 +48,23 @@ export class AuthService {
     return this.signup(createUserDto);
   }
 
-   async adminSignup(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
+  async adminSignup(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
     createUserDto.role = UserRole.ADMIN;
     return this.signup(createUserDto);
   }
 
-  async userSignin(email: string, password: string ): Promise<Partial<AuthResponseDto>> {
+  async userSignin(
+    email: string,
+    password: string,
+  ): Promise<Partial<AuthResponseDto>> {
     const user = await this.validateUserCredentials(email, password);
     return this.handleTokens(user);
   }
 
-   async adminSignin(email: string, password: string ): Promise<Partial<AuthResponseDto>> {
+  async adminSignin(
+    email: string,
+    password: string,
+  ): Promise<Partial<AuthResponseDto>> {
     const user = await this.validateUserCredentials(email, password);
 
     // Check if user is an admin
@@ -67,7 +73,7 @@ export class AuthService {
       throw new ForbiddenException('Access denied: Admins only');
     }
 
-     return this.handleTokens(user);
+    return this.handleTokens(user);
   }
 
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
@@ -91,21 +97,24 @@ export class AuthService {
       );
 
       return { accessToken: newAccessToken };
-
     } catch {
       throw new UnauthorizedException('Invalid or expired refresh token');
     }
   }
 
   private async handleTokens(user: User): Promise<AuthResponseDto> {
-    const { accessToken, refreshToken } = await AuthServiceHelper.generateTokens(
-      user,
-      this.jwtService,
-      this.configService,
-    );
+    const { accessToken, refreshToken } =
+      await AuthServiceHelper.generateTokens(
+        user,
+        this.jwtService,
+        this.configService,
+      );
 
     const hashedRefreshToken = await bcrypt.hash(refreshToken, 10);
-    await this.usersService.updateHashedRefreshToken(user.id, hashedRefreshToken);
+    await this.usersService.updateHashedRefreshToken(
+      user.id,
+      hashedRefreshToken,
+    );
 
     return {
       user,
@@ -114,17 +123,21 @@ export class AuthService {
     };
   }
 
-  private async validateUserCredentials(email: string, password: string): Promise<User> {
+  private async validateUserCredentials(
+    email: string,
+    password: string,
+  ): Promise<User> {
     this.logger.log(`Signin initiated - email: ${email}`);
 
     const user = await this.usersService.findByEmail(email);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const passwordMatches = await bcrypt.compare(password, user.password);
-    if (!passwordMatches) throw new UnauthorizedException('Invalid credentials');
+    if (!passwordMatches)
+      throw new UnauthorizedException('Invalid credentials');
 
     return user;
-}
+  }
 
   async logout(userId: number) {
     await this.usersService.updateHashedRefreshToken(userId, null);

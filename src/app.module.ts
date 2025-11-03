@@ -6,10 +6,13 @@ import { UsersModule } from './users/users.module';
 import { MealsModule } from './meals/meals.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
-import { User } from './users/user.entity';
-import { Meal } from './meals/meal.entity';
-import { Ai } from './ai/ai.entity';
+import { User } from './users/entities/user.entity';
+import { Ai } from './ai/entities/ai.entity';
 import { ConfigModule, ConfigService } from '@nestjs/config';
+import { IngredientsModule } from './ingredients/ingredients.module';
+import { Meal } from './meals/entities/meal.entity';
+import { MealItem } from './meals/entities/meal-item.entity';
+import { Ingredient } from './ingredients/entities/ingredient.entity';
 
 @Module({
   imports: [
@@ -28,10 +31,10 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
           username: config.get<string>('DB_USERNAME'),
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
-          entities: [User, Meal, Ai],
+          entities: [User, Meal, MealItem, Ingredient, Ai],
           synchronize: true,
           logging: true,
-          //dropSchema: true
+          //dropSchema: true,
         };
       },
     }),
@@ -39,6 +42,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
     UsersModule,
     MealsModule,
     AuthModule,
+    IngredientsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
