@@ -8,8 +8,8 @@ export class Ingredient {
   @Column({ unique: true })
   name: string; // e.g., "Chicken breast"
 
-  @Column()
-  description: string;
+  @Column({ nullable: true })
+  description?: string;
 
   @Column('float')
   caloriesPer100g: number;

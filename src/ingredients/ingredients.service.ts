@@ -1,4 +1,4 @@
-import { Injectable, Logger, NotFoundException } from '@nestjs/common';
+import { ConflictException, Injectable, Logger, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Ingredient } from './entities/ingredient.entity';
 import { Repository } from 'typeorm';
@@ -14,6 +14,15 @@ export class IngredientsService {
   ) {}
 
   async createIngredient(dto: CreateIngredientDto): Promise<Ingredient> {
+    this.logger.log('Checking if ingredient already exists...');
+    
+    const existingIngredient = await this.ingredientsRepo.findOne({
+      where: { name: dto.name }
+    });
+
+    if (existingIngredient)throw new ConflictException(`Ingredient '${dto.name}' already exists in database`);
+  
+
     this.logger.log('Creating new ingredient...');
 
     const ingredient = this.ingredientsRepo.create({
@@ -76,5 +85,15 @@ export class IngredientsService {
     if (result.affected === 0) throw new NotFoundException(`Ingredient with id ${id} not found`);
 
     this.logger.log(`Ingredient ${id} deleted successfully`);
+  }
+
+  async findOneByName(name: string): Promise<Ingredient | null> {
+    this.logger.log(`Searching ingredient by name ${name}`);
+
+    const ingredient = await this.ingredientsRepo.findOneBy({ name });
+    if (!ingredient) return null;
+
+    this.logger.log('Ingredient found');
+    return ingredient;
   }
 }

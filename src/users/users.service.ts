@@ -4,7 +4,7 @@ import {
   NotFoundException,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
-import { User } from './user.entity';
+import { User } from './entities/user.entity';
 import { Repository } from 'typeorm';
 import { CreateUserDto } from '../auth/dtos/create-user.dto';
 import { Logger } from '@nestjs/common';
@@ -47,7 +47,10 @@ export class UsersService {
     return this.usersRepo.find();
   }
 
-  async updateHashedRefreshToken(userId: number, hashedToken: string | null): Promise<void> {
+  async updateHashedRefreshToken(
+    userId: number,
+    hashedToken: string | null,
+  ): Promise<void> {
     await this.usersRepo.update(userId, { hashedRefreshToken: hashedToken });
   }
 
@@ -56,8 +59,8 @@ export class UsersService {
 
     const user = await this.findByEmail(email);
 
-    if(!user) throw new NotFoundException('User not found');
-    
+    if (!user) throw new NotFoundException('User not found');
+
     Object.assign(user, attrs);
 
     const updatedUser = await this.usersRepo.save(user);
@@ -65,5 +68,19 @@ export class UsersService {
     this.logger.log('User has been updated.');
 
     return updatedUser;
+  }
+
+  async delete(email: string): Promise<User> {
+    this.logger.log(`Deleting user by email: ${email}`);
+
+    const user = await this.findByEmail(email);
+
+    if (!user) throw new NotFoundException('User not found');
+
+    const deletedUser = await this.usersRepo.remove(user);
+
+    this.logger.log('User has been deleted.');
+
+    return deletedUser;
   }
 }

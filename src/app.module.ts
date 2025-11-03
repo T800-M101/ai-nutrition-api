@@ -33,7 +33,7 @@ import { Ingredient } from './ingredients/entities/ingredient.entity';
           database: config.get<string>('DB_NAME'),
           entities: [User, Meal, MealItem, Ingredient, Ai],
           synchronize: true,
-          logging: true,
+          logging: ['error', 'warn'],
           //dropSchema: true,
         };
       },

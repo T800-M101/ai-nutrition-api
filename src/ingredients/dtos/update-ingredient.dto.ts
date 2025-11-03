@@ -15,20 +15,20 @@ export class UpdateIngredientDto {
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  calories?: number;
+  caloriesPer100g?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  protein?: number;
+  proteinPer100g?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  carbs?: number;
+  carbsPer100g?: number;
 
   @ApiPropertyOptional()
   @IsOptional()
   @IsNumber()
-  fats?: number;
+  fatsPer100g?: number;
 }
