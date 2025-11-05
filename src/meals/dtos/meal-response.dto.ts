@@ -1,46 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-
-
-class MealItemResponse {
-  @ApiProperty({ example: 'Chicken Breast' })
-  @Expose()
-  ingredientName: string;
-
-  @ApiProperty({ example: 200 })
-  @Expose()
-  quantity: number;
-
-  @ApiProperty({ example: 330 })
-  @Expose()
-  calories: number;
-
-  @ApiProperty({ example: 62 })
-  @Expose()
-  protein: number;
-
-  @ApiProperty({ example: 0 })
-  @Expose()
-  carbs: number;
-
-  @ApiProperty({ example: 7 })
-  @Expose()
-  fats: number;
-}
-
-class MealUserDto {
-  @ApiProperty({ example: 1 })
-  @Expose()
-  id: number;
-
-  @ApiProperty({ example: 'John Doe' })
-  @Expose()
-  name: string;
-
-  @ApiProperty({ example: 'john@example.com' })
-  @Expose()
-  email: string;
-}
+import { MealItem } from './meal-item.dto';
 
 export class MealResponseDto {
   @ApiProperty({ example: 1 })
@@ -51,10 +11,10 @@ export class MealResponseDto {
   @Expose()
   name: string;
 
-  @ApiProperty({ type: [MealItemResponse] })
+  @ApiProperty({ type: [MealItem] })
   @Expose()
-  @Type(() => MealItemResponse)
-  items: MealItemResponse[];
+  @Type(() => MealItem)
+  items: MealItem[];
 
   @ApiProperty({ example: 650 })
   @Expose()
@@ -76,8 +36,6 @@ export class MealResponseDto {
   @Expose()
   createdAt: Date;
 
-  @ApiProperty({ type: MealUserDto })
   @Expose()
-  @Type(() => MealUserDto)
-  user: MealUserDto;
+  userId: number;
 }

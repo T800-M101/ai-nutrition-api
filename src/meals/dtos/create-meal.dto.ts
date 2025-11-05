@@ -13,7 +13,7 @@ import {
 import { Type } from 'class-transformer';
 
 
-class MealItemDto {
+class ItemDto {
   @ApiProperty({ example: 'Chicken Breast' })
   @IsString()
   @IsNotEmpty()
@@ -37,13 +37,13 @@ export class CreateMealDto {
     { name: 'Chicken Breast', quantity: 200 },
     { name: 'Brown Rice', quantity: 150 },
   ],
-  type: [MealItemDto],
+  type: [ItemDto],
 })
 @IsArray()
 @ArrayMinSize(1, { message: 'Meal must have at least one item' })
 @ValidateNested({ each: true })
-@Type(() => MealItemDto)
-items: MealItemDto[];
+@Type(() => ItemDto)
+items: ItemDto[];
 
 @ApiProperty({ example: '2025-11-03T12:00:00.000Z', required: false })
 @IsDateString()
