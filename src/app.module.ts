@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { AiModule } from './ai/ai.module';
 import { UsersModule } from './users/users.module';
 import { MealsModule } from './meals/meals.module';
@@ -13,6 +11,8 @@ import { IngredientsModule } from './ingredients/ingredients.module';
 import { Meal } from './meals/entities/meal.entity';
 import { MealItem } from './meals/entities/meal-item.entity';
 import { Ingredient } from './ingredients/entities/ingredient.entity';
+import { CategoriesModule } from './categories/categories.module';
+import { Category } from './categories/entities/category.entity';
 
 @Module({
   imports: [
@@ -31,7 +31,7 @@ import { Ingredient } from './ingredients/entities/ingredient.entity';
           username: config.get<string>('DB_USERNAME'),
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
-          entities: [User, Meal, MealItem, Ingredient, Ai],
+          entities: [User, Meal, MealItem, Ingredient, Ai, Ingredient, Category],
           synchronize: true,
           logging: ['error', 'warn'],
           //dropSchema: true,
@@ -43,8 +43,9 @@ import { Ingredient } from './ingredients/entities/ingredient.entity';
     MealsModule,
     AuthModule,
     IngredientsModule,
+    CategoriesModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}
