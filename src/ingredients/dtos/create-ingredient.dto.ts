@@ -25,7 +25,7 @@ export class CreateIngredientDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  calories: number;
+  caloriesPer100g: number;
 
   @ApiProperty({
     example: 31,
@@ -33,7 +33,7 @@ export class CreateIngredientDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  protein: number;
+  proteinPer100g: number;
 
   @ApiProperty({
     example: 0,
@@ -41,7 +41,7 @@ export class CreateIngredientDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  carbs: number;
+  carbsPer100g: number;
 
   @ApiProperty({
     example: 3.6,
@@ -49,5 +49,5 @@ export class CreateIngredientDto {
   })
   @IsNumber()
   @IsNotEmpty()
-  fats: number;
+  fatsPer100g: number;
 }

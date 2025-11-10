@@ -3,6 +3,8 @@ import { AppModule } from './app.module';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
 import { ConfigService } from '@nestjs/config';
+import { writeFileSync } from 'fs';
+import * as yaml from 'js-yaml';
 
 
 async function bootstrap() {
@@ -39,6 +41,7 @@ async function bootstrap() {
     .setTitle('Ai nutrition API')
     .setDescription('API for managing ai nutrition API')
     .setVersion('1.0')
+    .addTag('categories')
     .addTag('users')
     .addTag('meals')
     .addTag('ai')
@@ -47,9 +50,11 @@ async function bootstrap() {
     .build();
 
   const document = SwaggerModule.createDocument(app, config);
+  writeFileSync('./openapi.json', JSON.stringify(document, null, 2));
+  writeFileSync('./openapi.yml', yaml.dump(document, { noRefs: true }));
+
   SwaggerModule.setup('api/docs', app, document);
   const PORT = process.env.PORT ?? 3000;
-
 
 
   await app.listen( PORT );
