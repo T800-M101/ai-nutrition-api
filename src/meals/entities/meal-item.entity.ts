@@ -8,21 +8,21 @@ export class MealItem {
   id: number;
 
   @ManyToOne(() => Ingredient, { eager: true })
-  ingredient: Ingredient;
+  item: Ingredient;
 
-  @Column('float')
+  @Column({ type: 'float', default: 0 })
   quantity: number; // in grams
 
-  @Column('float')
+  @Column({ type: 'float', default: 0 })
   calories: number;
 
-  @Column('float')
+  @Column({ type: 'float', default: 0 })
   protein: number;
 
-  @Column('float')
+  @Column({ type: 'float', default: 0 })
   carbs: number;
 
-  @Column('float')
+  @Column({ type: 'float', default: 0 })
   fats: number;
 
   @ManyToOne(() => Meal, (meal) => meal.items)

@@ -1,6 +1,6 @@
 import { Expose, Type } from 'class-transformer';
 import { ApiProperty } from '@nestjs/swagger';
-import { MealItem } from './meal-item.dto';
+import { MealItemDto } from './meal-item.dto';
 
 export class MealResponseDto {
   @ApiProperty({ example: 1 })
@@ -11,10 +11,10 @@ export class MealResponseDto {
   @Expose()
   name: string;
 
-  @ApiProperty({ type: [MealItem] })
+  @ApiProperty({ type: [MealItemDto] })
   @Expose()
-  @Type(() => MealItem)
-  items: MealItem[];
+  @Type(() => MealItemDto)
+  items: MealItemDto[];
 
   @ApiProperty({ example: 650 })
   @Expose()

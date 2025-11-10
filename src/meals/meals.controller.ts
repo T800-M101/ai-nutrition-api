@@ -6,85 +6,103 @@ import {
   Logger,
   Param,
   Post,
-  Put,
+  Patch,
   Req,
   UseGuards,
 } from '@nestjs/common';
 import { ApiBearerAuth, ApiTags } from '@nestjs/swagger';
-//import { MealsService } from './meals.service';
 import { CreateMealDto } from './dtos/create-meal.dto';
 import { RequestWithUser } from '../interfaces/resquest-user.interface';
 import { JwtAuthGuard } from 'src/auth/guards/jwt-auth.guard';
 import { Serialize } from 'src/interceptors/serialize.interceptor';
-import { MealResponseDto } from './dtos/meal-response.dto';
 import { MealsService } from './meals.service';
-import { Meal } from './entities/meal.entity';
+import { DailySummaryDto } from './dtos/daily-summary.dto';
+import { MealResponseDto } from './dtos/meal-response.dto';
+import { UpdateMealDto } from './dtos/update-meal-item.dto';
 
 @ApiTags('meals')
 @Controller('meals')
-@Serialize(MealResponseDto)
 @UseGuards(JwtAuthGuard)
 export class MealsController {
-  private readonly logger = new Logger(MealsController.name);
+//   private readonly logger = new Logger(MealsController.name);
 
-  constructor(private readonly mealsService: MealsService) {}
+//   constructor(private readonly mealsService: MealsService) {}
 
-//   @Post('analysis')
-//   @UseGuards(JwtAuthGuard)
-//   async submitMeal(
-//     @Req() req: RequestWithUser,
-//     @Body() body: CreateMealDto & { acceptAI?: boolean },
-//   ) {
-//     const user = req.user;
-
-//     const itemsArray: string[] = Array.isArray(body.items)
-//       ? body.items
-//       : JSON.parse(body.items);
-//     const mealAnalysis = await this.mealsService.processMeal(
-//       user.email,
-//       itemsArray,
-//       body.name,
-//       body.acceptAI,
+//   @Post()
+//   @ApiBearerAuth()
+//   @Serialize(MealResponseDto)
+//   async createMeal(
+//     @Body() body: CreateMealDto,
+//     @Req() { user: { userId } }: RequestWithUser,
+//   ): Promise<MealResponseDto> {
+//     this.logger.log(
+//       `POST /meals - Received create meal request for user ${userId}`,
 //     );
 
-//     return mealAnalysis;
+//     this.logger.log('Successfully meal created.');
+//     return this.mealsService.createMeal(userId, body);
 //   }
-
-  @Post()
-  @ApiBearerAuth()
-  async createMeal(@Body() body: CreateMealDto, @Req() req: RequestWithUser): Promise<any> {
-    this.logger.log('POST /meals/create - Received create meal request');
-
-    const user = req.user;
-    this.logger.log('Returning response for new meal created.');
-    return this.mealsService.createMeal(user.email, body);
-  }
-}
-
 
 //   @Get()
-//   async getUserMeals(@Req() req: Request) {
-//     const user = req.user;
-//     return this.mealsService.findAllByUser(user.id);
+//   @ApiBearerAuth()
+//   @Serialize(MealResponseDto)
+//   async getUserMeals(
+//     @Req() { user: { userId } }: RequestWithUser,
+//   ): Promise<MealResponseDto[]> {
+//     this.logger.log('GET /meals - Received get all user meals request');
+
+//     const meals = await this.mealsService.findMealsByUserId(userId);
+//     this.logger.log(
+//       `Successfully retrieved ${meals.length} meals for user ${userId}`,
+//     );
+
+//     return meals;
 //   }
 
-//   @Get(':id')
-//   async getMeal(@Param('id') id: number, @Req() req: Request) {
-//     const user = req.user;
-//     return this.mealsService.findById(id, user.id);
+//   @Get('/:name')
+//   @ApiBearerAuth()
+//   @Serialize(MealResponseDto)
+//   async findMealByName(
+//     @Param('name') mealName: string,
+//     @Req() { user: { userId } }: RequestWithUser,
+//   ): Promise<MealResponseDto> {
+//     this.logger.log('GET /meals/:name - Received get user meal by name');
+
+//     const meal = await this.mealsService.findMealByName(userId, mealName);
+//     this.logger.log(`Successfully retrieved meal for user ${userId}`);
+
+//     return meal;
 //   }
 
-//   @Put(':id')
+//   @Get('/daily/:date')
+//   @ApiBearerAuth()
+//   @Serialize(DailySummaryDto)
+//   async getDailySummary(
+//     @Param('date') date: string,
+//     @Req() { user: { userId } }: RequestWithUser,
+//   ): Promise<DailySummaryDto> {
+//     this.logger.log(
+//       `GET /meals/${date} - Fetching daily summary for user ID: ${userId}`,
+//     );
+
+//     const meals = await this.mealsService.findMealsByDate(userId, date);
+
+//     this.logger.log(`Returning daily summary for user ID: ${userId}`);
+
+//     return meals;
+//   }
+
+//   @Patch()
+//   @ApiBearerAuth()
+//   @Serialize(MealResponseDto)
 //   async updateMeal(
-//     @Param('id') id: number,
-//     @Body() body: UpdateMealDto,
-//     @Req() req: Request,
-//   ) {
-//     const user = req.user;
-//     return this.mealsService.updateMeal(id, user.id, body);
-//   }
+//     @Body() attrs: UpdateMealDto,
+//     @Req() { user: { userId } }: RequestWithUser,
+//   ): Promise<MealResponseDto> {
+//     this.logger.log(
+//       `PATCH /meals/${userId} - Updating meal for user ${userId}`,
+//     );
 
-//   @Delete(':id')
-//   async deleteMeal(@Param('id') id: number, @Req() req: Request) {
-//     const user = req.user;
-//     return this.mealsService.deleteMeal(id, user.id);
+//     return await this.mealsService.updateMeal(attrs, userId);
+//   }
+}

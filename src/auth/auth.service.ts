@@ -20,12 +20,12 @@ export class AuthService {
   private readonly logger = new Logger(AuthService.name);
 
   constructor(
-    private usersService: UsersService,
-    private jwtService: JwtService,
-    private configService: ConfigService,
+    private readonly usersService: UsersService,
+    private readonly jwtService: JwtService,
+    private readonly configService: ConfigService,
   ) {}
 
-  async signup(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
+  async create(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
     const { email } = createUserDto;
     this.logger.log(`Signup initiated - email: ${email}`);
 
@@ -44,32 +44,26 @@ export class AuthService {
     return this.handleTokens(user);
   }
 
-  async userSignup(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
-    return this.signup(createUserDto);
+  async createUser(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
+    return this.create(createUserDto);
   }
 
-  async adminSignup(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
+  async createAdmin(createUserDto: CreateUserDto): Promise<AuthResponseDto> {
     createUserDto.role = UserRole.ADMIN;
-    return this.signup(createUserDto);
+    return this.create(createUserDto);
   }
 
-  async userSignin(
-    email: string,
-    password: string,
-  ): Promise<Partial<AuthResponseDto>> {
-    const user = await this.validateUserCredentials(email, password);
+  async userSignin(userId: number, password: string): Promise<AuthResponseDto> {
+    const user = await this.validateUserCredentials(userId, password);
     return this.handleTokens(user);
   }
 
-  async adminSignin(
-    email: string,
-    password: string,
-  ): Promise<Partial<AuthResponseDto>> {
-    const user = await this.validateUserCredentials(email, password);
+  async adminSignin(userId: number, password: string): Promise<AuthResponseDto> {
+    const user = await this.validateUserCredentials(userId, password);
 
     // Check if user is an admin
     if (user.role !== UserRole.ADMIN) {
-      this.logger.warn(`Unauthorized admin signin attempt - email: ${email}`);
+      this.logger.warn(`Unauthorized admin signin attempt - id: ${userId}`);
       throw new ForbiddenException('Access denied: Admins only');
     }
 
@@ -79,14 +73,14 @@ export class AuthService {
   async refreshToken(refreshToken: string): Promise<{ accessToken: string }> {
     try {
       const payload = await this.jwtService.verifyAsync(refreshToken);
-      const user = await this.usersService.findByEmail(payload.email);
+      const user = await this.usersService.findById(payload.id);
 
-      if (!user || !user.hashedRefreshToken)
+      if (!user || !user.hashed_refresh_token)
         throw new UnauthorizedException('Invalid refresh token');
 
       const isMatch = await bcrypt.compare(
         refreshToken,
-        user.hashedRefreshToken,
+        user.hashed_refresh_token,
       );
       if (!isMatch) throw new UnauthorizedException('Refresh token mismatch');
 
@@ -124,12 +118,12 @@ export class AuthService {
   }
 
   private async validateUserCredentials(
-    email: string,
+    userId: number,
     password: string,
   ): Promise<User> {
-    this.logger.log(`Signin initiated - email: ${email}`);
+    this.logger.log(`Signin initiated - id: ${userId}`);
 
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findById(userId);
     if (!user) throw new UnauthorizedException('Invalid credentials');
 
     const passwordMatches = await bcrypt.compare(password, user.password);

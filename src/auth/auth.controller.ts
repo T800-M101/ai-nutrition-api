@@ -13,14 +13,14 @@ import { AuthResponseDto } from './dtos/auth-response.dto';
 export class AuthController {
   private readonly logger = new Logger(AuthController.name);
 
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
   @Post('/signup')
-  async createUser(@Body() body: CreateUserDto): Promise<Partial<AuthResponseDto>> {
+  async userSignup(@Body() body: CreateUserDto): Promise<AuthResponseDto> {
     const { email } = body;
     this.logger.log(`POST /auth/signup - Received signup request: email: ${email}`);
 
-    const user = await this.authService.userSignup(body);
+    const user = await this.authService.createUser(body);
     
     this.logger.log(`User created successfully: ${email}`);
 
@@ -28,11 +28,11 @@ export class AuthController {
   }
 
   @Post('/admin/signup')
-  async adminSignup(@Body() body: CreateUserDto): Promise<Partial<AuthResponseDto>> {
+  async adminSignup(@Body() body: CreateUserDto): Promise<AuthResponseDto> {
     const { email } = body;
     this.logger.log(`POST /auth/admin/signup - Received admin signup request: email: ${email}`);
     
-    const admin = await this.authService.adminSignup(body);
+    const admin = await this.authService.createAdmin(body);
     
     this.logger.log(`Admin created successfully: ${email}`);
 
@@ -40,25 +40,25 @@ export class AuthController {
   }
 
   @Post('/signin')
-  async login(@Body() body: SigninDto): Promise<Partial<AuthResponseDto>> {
-    const { email, password } = body;
+  async userLogin(@Body() body: SigninDto): Promise<AuthResponseDto> {
+    const { user_id, password } = body;
   
-    this.logger.log(`POST /auth/signin - Received login request: email: ${email}`);
+    this.logger.log(`POST /auth/signin - Received login request: id: ${user_id}`);
 
-    const user = await this.authService.userSignin(email, password);
-    this.logger.log(`User logged in successfully: ${email}`);
+    const user = await this.authService.userSignin(user_id, password);
+    this.logger.log(`User logged in successfully: ${user_id}`);
 
     return user;
   }
 
   @Post('/admin/signin')
-  async adminLogin(@Body() body: SigninDto): Promise<Partial<AuthResponseDto>> {
-    const { email, password } = body;
+  async adminLogin(@Body() body: SigninDto): Promise<AuthResponseDto> {
+    const { user_id, password } = body;
   
-    this.logger.log(`POST /auth/admin/signin - Received admin login request: email: ${email}`);
+    this.logger.log(`POST /auth/admin/signin - Received admin login request: id: ${user_id}`);
 
-    const admin = await this.authService.adminSignin(email, password);
-    this.logger.log(`Admin logged in successfully: ${email}`);
+    const admin = await this.authService.adminSignin(user_id, password);
+    this.logger.log(`Admin logged in successfully: ${user_id}`);
 
     return admin;
   }

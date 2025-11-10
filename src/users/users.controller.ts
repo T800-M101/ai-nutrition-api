@@ -5,6 +5,7 @@ import {
   Get,
   Logger,
   Param,
+  ParseIntPipe,
   Patch,
   Req,
   UseGuards,
@@ -46,7 +47,7 @@ export class UsersController {
   @ApiBearerAuth()
   async getMe(@Req() req: RequestWithUser): Promise<Partial<User> | null> {
     this.logger.log('GET /me - Received get request own user');
-    const user = await this.usersService.findByEmail(req.user.email);
+    const user = await this.usersService.findById(req.user.userId);
 
     this.logger.log('Returning user');
     return user;
@@ -55,12 +56,9 @@ export class UsersController {
   @Patch('/me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async updateUser(
-    @Param('email') email: string,
-    @Body() attrs: UpdateUserDto,
-  ): Promise<Partial<User>> {
+  async updateUser(@Param('id', ParseIntPipe) userId: number, @Body() attrs: UpdateUserDto): Promise<Partial<User>> {
     this.logger.log('PATCH /me - Received patch request own user');
-    const updatedUser = await this.usersService.update(email, attrs);
+    const updatedUser = await this.usersService.update(userId, attrs);
 
     this.logger.log('Returning updated user');
     return updatedUser;
@@ -69,9 +67,9 @@ export class UsersController {
   @Delete('/me')
   @UseGuards(JwtAuthGuard)
   @ApiBearerAuth()
-  async deleteUser(@Param('email') email: string): Promise<Partial<User>> {
+  async deleteUser(@Param('id', ParseIntPipe) userId: number): Promise<Partial<User>> {
     this.logger.log('PATCH /me - Received delete request own user');
-    const deletedUser = await this.usersService.delete(email);
+    const deletedUser = await this.usersService.delete(userId);
 
     this.logger.log('Returning deleted user');
     return deletedUser;

@@ -42,17 +42,17 @@ export class User {
   preferences?: string; // "vegetarian, non-dairy"
 
   @Column({ type: 'text', nullable: true })
-  hashedRefreshToken?: string | null;
+  hashed_refresh_token?: string | null;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @CreateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 
   @OneToMany(() => Meal, (meal) => meal.user)
   meals: Meal[];
 
   @OneToMany(() => Ai, (ai) => ai.user)
-  aiRequest: Ai[];
+  ai_request: Ai[];
 }

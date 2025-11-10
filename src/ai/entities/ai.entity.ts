@@ -24,6 +24,6 @@ export class Ai {
   @CreateDateColumn()
   createdAt: Date;
 
-  @ManyToOne(() => User, (user) => user.aiRequest, { onDelete: 'CASCADE' })
+  @ManyToOne(() => User, (user) => user.ai_request, { onDelete: 'CASCADE' })
   user: User;
 }

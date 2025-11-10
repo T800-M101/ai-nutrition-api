@@ -14,7 +14,7 @@ import { UpdateUserDto } from './dtos/update-user.dto';
 export class UsersService {
   private readonly logger = new Logger(UsersService.name);
 
-  constructor(@InjectRepository(User) private usersRepo: Repository<User>) {}
+  constructor(@InjectRepository(User) private readonly usersRepo: Repository<User>) {}
 
   async create(createUserDto: CreateUserDto): Promise<User> {
     const { email } = createUserDto;
@@ -38,7 +38,12 @@ export class UsersService {
     }
   }
 
-  async findByEmail(email: string): Promise<User | null> {
+  async findById(userId: number): Promise<User | null> {
+    this.logger.log(`Searching for user by id: ${userId}`);
+    return await this.usersRepo.findOneBy({ id: userId });
+  }
+
+    async findByEmail(email: string): Promise<User | null> {
     this.logger.log(`Searching for user by email: ${email}`);
     return await this.usersRepo.findOneBy({ email });
   }
@@ -51,13 +56,13 @@ export class UsersService {
     userId: number,
     hashedToken: string | null,
   ): Promise<void> {
-    await this.usersRepo.update(userId, { hashedRefreshToken: hashedToken });
+    await this.usersRepo.update(userId, { hashed_refresh_token: hashedToken });
   }
 
-  async update(email: string, attrs: UpdateUserDto): Promise<User> {
-    this.logger.log(`Updating user by email: ${email}`);
+  async update(userId: number, attrs: UpdateUserDto): Promise<User> {
+    this.logger.log(`Updating user by id: ${userId}`);
 
-    const user = await this.findByEmail(email);
+    const user = await this.findById( userId );
 
     if (!user) throw new NotFoundException('User not found');
 
@@ -70,10 +75,10 @@ export class UsersService {
     return updatedUser;
   }
 
-  async delete(email: string): Promise<User> {
-    this.logger.log(`Deleting user by email: ${email}`);
+  async delete(userId: number): Promise<User> {
+    this.logger.log(`Deleting user by id: ${userId}`);
 
-    const user = await this.findByEmail(email);
+    const user = await this.findById(userId);
 
     if (!user) throw new NotFoundException('User not found');
 

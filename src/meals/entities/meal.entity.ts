@@ -7,8 +7,8 @@ import {
   OneToMany,
   UpdateDateColumn,
 } from 'typeorm';
-import { MealItem } from './meal-item.entity';
 import { User } from 'src/users/entities/user.entity';
+import { MealItem } from './meal-item.entity';
 
 @Entity('meals')
 export class Meal {
@@ -25,8 +25,8 @@ export class Meal {
   user: User;
 
   @CreateDateColumn()
-  createdAt: Date;
+  created_at: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updated_at: Date;
 }
